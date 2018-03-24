@@ -1,5 +1,9 @@
 # emread
-CLI program to convert a .eml file to .html
+CLI program to convert a .eml file to .html and launches it
+in the os's default browser. This is a limited use case but
+I've found it is helpful as a Linux user who works with Outlook
+users attaching .eml files
+
 
 usage:  emread [options] <inputFilename>
 
