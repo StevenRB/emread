@@ -50,6 +50,7 @@ func openBrowser(url string) bool {
 func main() {
 	var fileName string
 
+	// Sets up various flags
 	helpFlg := flag.Bool("help", false, "displays help")
 	hFlg := flag.Bool("h", false, "displays help")
 	noBrowse := flag.Bool("s", false, "Suppresses the automatic browser launch")
@@ -58,15 +59,13 @@ func main() {
 
 	flag.Parse()
 
-	// fileName := flag.Arg(0)
-
+	// Displays helpString if requested
 	if *helpFlg == true || *hFlg == true {
 		fmt.Println(helpString)
 		os.Exit(0)
 	}
 
-	// flag to point to the file we will be parsing and checks that file
-	// has been provided
+	// If emread is run without an input file, this will display the help string
 	if flag.NArg() < 1 {
 		fmt.Println(helpString)
 		os.Exit(0)
@@ -136,10 +135,14 @@ func main() {
 	} else {
 		fmt.Printf("Success! Email contents written to %s.html\n", t[0])
 
+		// Controls whether to launch the browser or not
 	}
 	if *noBrowse == false {
 		openBrowser(newFile)
 	}
+
+	// The sleep is because launching the browser takes a moment
+	// If you don't sleep, it will delete before it even launches
 	if *delFile == true {
 		time.Sleep(2 * time.Second)
 		os.Remove(newFile)
