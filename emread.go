@@ -18,20 +18,7 @@ import (
 	"time"
 )
 
-const helpString = `
-		Emread 2018
-Converts .eml to .html
-
-usage:  emread [options] <inputFilename>
-
-options:
---help           displays this dialogue
---o "filename"   specifies the output filename
---s              suppresses the automatic browser launch
---d              deletes the html file once launched
-
-https://github.com/StevenRB/emread/ 
-`
+const versionNum = "0.2"
 
 func openBrowser(url string) bool {
 	var args []string
@@ -50,24 +37,44 @@ func openBrowser(url string) bool {
 func main() {
 	var fileName string
 
+	helpString := `
+Emread 2018 ver %s
+Converts .eml to .html
+
+usage:  emread [options] <inputFilename>
+
+options:
+--help           displays this dialogue
+--o "filename"   specifies the output filename
+--s              suppresses the automatic browser launch
+--d              deletes the html file once launched
+
+https://github.com/StevenRB/emread/ 
+`
+
 	// Sets up various flags
 	helpFlg := flag.Bool("help", false, "displays help")
 	hFlg := flag.Bool("h", false, "displays help")
 	noBrowse := flag.Bool("s", false, "Suppresses the automatic browser launch")
 	delFile := flag.Bool("d", false, "Delete the .html file after loading")
 	output := flag.String("o", "blank", "Output filename")
+	verFlg := flag.Bool("v", false, "Displays version number")
 
 	flag.Parse()
 
-	// Displays helpString if requested
+	// Displays version or helpString if requested
+	if *verFlg == true {
+		fmt.Println("Emread version", versionNum)
+		os.Exit(0)
+	}
 	if *helpFlg == true || *hFlg == true {
-		fmt.Println(helpString)
+		fmt.Printf(helpString, versionNum)
 		os.Exit(0)
 	}
 
 	// If emread is run without an input file, this will display the help string
 	if flag.NArg() < 1 {
-		fmt.Println(helpString)
+		fmt.Printf(helpString, versionNum)
 		os.Exit(0)
 	} else {
 		fileName = flag.Arg(0)
