@@ -1,7 +1,10 @@
 /*
 This program is meant to address the issue when someone sends you a
 .eml file as an attachment. It will process it into an html file
-and load it in your default browser
+and load it in your default browser.
+
+Need to organize the switch case so that I can determine what OS
+is being used to accomodate Windows use of `\` as a directory switch
 */
 
 package main
@@ -13,12 +16,13 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
 )
 
-const versionNum = "0.2"
+const versionNum = "0.2.1"
 
 func openBrowser(url string) bool {
 	var args []string
@@ -45,9 +49,11 @@ usage:  emread [options] <inputFilename>
 
 options:
 --help           displays this dialogue
+--v              show version information
 --o "filename"   specifies the output filename
 --s              suppresses the automatic browser launch
 --d              deletes the html file once launched
+--t <seconds>    time to delay deletion (helps ensure browser launch)
 
 https://github.com/StevenRB/emread/ 
 `
@@ -59,7 +65,7 @@ https://github.com/StevenRB/emread/
 	delFile := flag.Bool("d", false, "Delete the .html file after loading")
 	output := flag.String("o", "blank", "Output filename")
 	verFlg := flag.Bool("v", false, "Displays version number")
-
+	timeFlg := flag.Int("t", 2, "Time in seconds to delay deletion")
 	flag.Parse()
 
 	// Displays version or helpString if requested
@@ -83,7 +89,8 @@ https://github.com/StevenRB/emread/
 	// Splits filename, grabs cwd, and creates filename with absolute path
 	var name string
 	pwd, _ := os.Getwd()
-	t := strings.Split(fileName, ".")
+	q := string(filepath.Base(fileName))
+	t := strings.Split(q, ".")
 	if *output != "blank" {
 		name = string(*output)
 	} else {
@@ -139,11 +146,10 @@ https://github.com/StevenRB/emread/
 	if _, err := fo.Write(decode); err != nil {
 		fmt.Println("Error writing to new file:", err)
 		os.Exit(1)
-	} else {
-		fmt.Printf("Success! Email contents written to %s.html\n", t[0])
-
-		// Controls whether to launch the browser or not
 	}
+
+	// Controls whether to launch the browser or not
+
 	if *noBrowse == false {
 		openBrowser(newFile)
 	}
@@ -151,7 +157,12 @@ https://github.com/StevenRB/emread/
 	// The sleep is because launching the browser takes a moment
 	// If you don't sleep, it will delete before it even launches
 	if *delFile == true {
-		time.Sleep(2 * time.Second)
+		time.Sleep(time.Duration(*timeFlg) * time.Second)
 		os.Remove(newFile)
+		fmt.Println("Success!")
+		os.Exit(0)
+	} else {
+		fmt.Printf("Success! Email contents written to %s.html\n", t[0])
+		os.Exit(0)
 	}
 }
